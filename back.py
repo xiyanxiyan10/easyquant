@@ -5,7 +5,7 @@ from datetime import datetime
 
 # data cleaning
 # get date from tushare
-ts.set_token('968f5f34be59eb4bbcdbcd6ae456eebac2d4f9706ff6fea778333523')
+ts.set_token('')
 pro = ts.pro_api()
 df = pro.coin_bar(start_date='20200615', end_date='20210616',
                   freq='15min', exchange='huobi', ts_code='ETH_USDT')
