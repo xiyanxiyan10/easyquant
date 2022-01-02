@@ -5,7 +5,7 @@ from datetime import datetime
 
 # data cleaning
 # get date from tushare
-ts.set_token('')
+ts.set_token('968f5f34be59eb4bbcdbcd6ae456eebac2d4f9706ff6fea778333523')
 pro = ts.pro_api()
 df = pro.coin_bar(start_date='20200615', end_date='20210616',
                   freq='15min', exchange='huobi', ts_code='ETH_USDT')
@@ -53,10 +53,10 @@ class MacdStrategy(bt.Strategy):
 
     def next(self):
         ''' 下一次执行 '''
-        print(self.dataclose[0])
+        
         # 记录收盘价
-        self.log('Close, %.2f' % self.dataclose[0])
-        print(self.PriceDateTime)
+        # self.log('Close, %.2f' % self.dataclose[0])
+        
 
         # 是否正在下单，如果是的话不能提交第二次订单
         if self.order:
