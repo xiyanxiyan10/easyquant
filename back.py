@@ -73,7 +73,7 @@ class MacdStrategy(bt.Strategy):
                 self.order = self.sell()
 
     def stop(self):
-        self.log(u'(金叉死叉有用吗) Ending Value %.2f' %
+        self.log(u' Ending Value %.2f' %
                  (self.broker.getvalue()), doprint=True)
 
 cerebro = bt.Cerebro()
