@@ -85,12 +85,12 @@ cerebro.broker.setcommission(commission=0.002)
 
 d1=start.strftime('%Y%m%d')
 d2=end.strftime('%Y%m%d')
-print(f'初始资金: {startcash}\n回测期间：{d1}:{d2}')
+print(f'初始资金:{startcash}\n回测期间：{d1}:{d2}')
 #运行回测系统
 
 cerebro.run()
 cerebro.plot()
-#portvalue = cerebro.broker.getvalue()
-#pnl = portvalue - startcash
+#portvalue = cerebro.broker.getvalue()
+#pnl = portvalue - startcash
 #打印结果
-#print(f'总资金: {round(portvalue,2)}')
+#print(f'总资金:{round(portvalue,2)}')
