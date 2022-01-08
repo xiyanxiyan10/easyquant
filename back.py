@@ -10,21 +10,23 @@ pro = ts.pro_api()
 df = pro.coin_bar(start_date='20200615', end_date='20210616',
                   freq='15min', exchange='huobi', ts_code='ETH_USDT')
 
-df.rename(columns={'trade_time':'datetime', 'vol':'volume'}, inplace=True)
-df['datetime']=df.datetime.apply(lambda x:pd.to_datetime(x))
-df['openinterest']=0
-df.index=pd.to_datetime(df.datetime)
+df.rename(columns={'trade_time': 'datetime', 'vol': 'volume'}, inplace=True)
+df['datetime'] = df.datetime.apply(lambda x: pd.to_datetime(x))
+df['openinterest'] = 0
+df.index = pd.to_datetime(df.datetime)
 
 print(df)
 
 
-#回测期间
-start=datetime(2020, 6, 15)
-end=datetime(2021, 6, 16)
+# 回测期间
+start = datetime(2020, 6, 15)
+end = datetime(2021, 6, 16)
 # 加载数据
-data = bt.feeds.PandasData(dataname=df,fromdate=start,todate=end)
+data = bt.feeds.PandasData(dataname=df, fromdate=start, todate=end)
 
-# policy 
+# policy
+
+
 class MacdStrategy(bt.Strategy):
     """
     继承并构建自己的bt策略
@@ -53,10 +55,9 @@ class MacdStrategy(bt.Strategy):
 
     def next(self):
         ''' 下一次执行 '''
-        
+
         # 记录收盘价
         # self.log('Close, %.2f' % self.dataclose[0])
-        
 
         # 是否正在下单，如果是的话不能提交第二次订单
         if self.order:
@@ -73,24 +74,26 @@ class MacdStrategy(bt.Strategy):
                 self.order = self.sell()
 
     def stop(self):
+        ''' stop '''
         self.log(u' Ending Value %.2f' %
                  (self.broker.getvalue()), doprint=True)
+
 
 cerebro = bt.Cerebro()
 cerebro.adddata(data=data)
 cerebro.addstrategy(MacdStrategy)
-startcash=1000
+startcash = 1000
 cerebro.broker.setcash(startcash)
 cerebro.broker.setcommission(commission=0.002)
 
-d1=start.strftime('%Y%m%d')
-d2=end.strftime('%Y%m%d')
+d1 = start.strftime('%Y%m%d')
+d2 = end.strftime('%Y%m%d')
 print(f'初始资金:{startcash}\n回测期间：{d1}:{d2}')
-#运行回测系统
+# 运行回测系统
 
 cerebro.run()
-cerebro.plot()
-#portvalue = cerebro.broker.getvalue()
-#pnl = portvalue - startcash
-#打印结果
-#print(f'总资金:{round(portvalue,2)}')
+cerebro.plot(iplot=False)
+# portvalue = cerebro.broker.getvalue()
+# pnl = portvalue - startcash
+# 打印结果
+# print(f'总资金:{round(portvalue,2)}')
