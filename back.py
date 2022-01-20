@@ -51,6 +51,22 @@ class MacdStrategy(bt.Strategy):
         self.sma10 = bt.indicators.SimpleMovingAverage(
             self.datas[0], period=10)
 
+        # Indicators for the plotting show
+        # 指数均线
+        bt.indicators.ExponentialMovingAverage(self.datas[0], period=21)
+        # 加权均线
+        bt.indicators.WeightedMovingAverage(self.datas[0], period=21,subplot=True)
+        #  慢速随机指数
+        bt.indicators.StochasticSlow(self.datas[0])
+        # 异同移动平均线
+        bt.indicators.MACDHisto(self.datas[0])
+        # 相对强弱指数
+        rsi = bt.indicators.RSI(self.datas[0])
+        # 平均相对强弱指数
+        bt.indicators.SmoothedMovingAverage(rsi, period=5)
+        # 平均真实波动范围
+        bt.indicators.ATR(self.datas[0], plot=False)
+
     def next(self):
         ''' 下一次执行 '''
         
