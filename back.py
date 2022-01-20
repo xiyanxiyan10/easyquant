@@ -25,8 +25,6 @@ end = datetime(2021, 6, 16)
 data = bt.feeds.PandasData(dataname=df, fromdate=start, todate=end)
 
 # policy
-
-
 class MacdStrategy(bt.Strategy):
     """
     继承并构建自己的bt策略
