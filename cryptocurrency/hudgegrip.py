@@ -52,6 +52,6 @@ while True:
     relative_volatility = cal_dist(old_long, eth_price, old_short, sol_price)
     print("%f %%" % (relative_volatility * 100))
 
-    time.sleep(60)
+    time.sleep(600)
     #print(f"Binance eth期货当前价格: {eth_price} USDT")
     #print(f"Binance sol期货当前价格: {sol_price} USDT")
