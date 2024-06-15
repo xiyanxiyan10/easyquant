@@ -1,0 +1,12 @@
+{
+    "binance": {
+        "apikey": "",
+        "secret": ""
+    },
+    "mail": {
+        "address": "",
+        "password": "",
+        "period": "1800"
+    }
+}
+
