@@ -2,7 +2,7 @@ from ccxtbt import CCXTStore
 import backtrader.analyzers as btanalyzers
 import matplotlib.pyplot as plt
 import backtrader as bt
-from  lib.mail import qq_mail_send 
+#from  lib.mail import qq_mail_send
 from datetime import datetime, timedelta
 
 import json
@@ -152,4 +152,3 @@ cerebro.adddata(short_data)
 # Run the strategy
 cerebro.run()
 cerebro.plot()
-plt.savefig('./bt.png')
