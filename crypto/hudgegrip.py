@@ -22,9 +22,11 @@ import json
 
 level = 4
 
+backtest_mode = False
 with open('./token.json', 'r') as f:
     config_params = json.load(f)
 
+backtest_mode = bool(config_params["backtest"]["mode"])
 mail_address = config_params["mail"]["address"]
 mail_password = config_params["mail"]["password"]
 mail_period = int(config_params["mail"]["period"])
@@ -32,19 +34,19 @@ event_period = EventPeriod(mail_period)
 
 ## 0 is long and 1 is short
 symbol_tuple = ('ETH/USDT', 'SOL/USDT')
-name_tuple = ('long', 'short')
 price_tuple = (3659.19, 158.55)
 
 class Hudge_Indicator(bt.Indicator):
-    lines = ('relative_volatility',)
+    lines = ('relative_volatility', 'long_price_volatility', 'short_price_volatility')
+    params = (('value', 5),)
+
     def __init__(self):
         self.addminperiod(1)
-
         self.long_price_close = self.data0.close
         #self.short_price_close = self.data1.close
 
     def next(self):
-        self.lines.relative_volatility[0] = self.long_price_close[0] 
+        self.lines.relative_volatility[0] = self.long_price_close[0]
         print("############### %f " % self.lines.relative_volatility[0])
 
 def hudge_dist(old_long, new_long, old_short, new_short):
@@ -54,9 +56,6 @@ def hudge_dist(old_long, new_long, old_short, new_short):
     long_profit_volatility = (new_long - old_long)*1.0/new_long*level*100    #long price volatility
     short_profit_volatility = (old_short - new_short)*1.0/new_short*level*100 # shot price volatility
 
-    print("long_price_volatility: %f %% short_price_volatility: %f %%" % (long_price_volatility*100, short_price_volatility*100))
-    print("long_profit_volatility: %f %% short_profit_volatility: %f %% , relative_profit: %f %%" % (long_profit_volatility, short_profit_volatility, \
-                                                                                       long_profit_volatility + short_profit_volatility))
     relative_volatility = long_price_volatility + short_price_volatility
     if relative_volatility < 0.0:
         relative_volatility = 0 - relative_volatility
@@ -69,7 +68,8 @@ class HudgeGripStrategy(bt.Strategy):
 
         self.ma = bt.indicators.SimpleMovingAverage(self.datas[0])
         self.ma = bt.indicators.SimpleMovingAverage(self.datas[1])
-        self.relative_volatility = self.hudge_Indicator.relative_volatility
+
+        # self.relative_volatility = self.hudge_Indicator.relative_volatility
         #self.sma = bt.indicators.SMA(self.data,period=21)
 
     def next(self):
@@ -95,18 +95,19 @@ class HudgeGripStrategy(bt.Strategy):
             output += ('{} - {} | O: {} H: {} L: {} C: {} V:{}\n'.format(data.datetime.datetime(),
                                                                                    data._name, data.open[0], data.high[0], data.low[0], data.close[0], data.volume[0],
                                                                                    ))
-            if data._name == name_tuple[0]:
+            if data._name == symbol_tuple[0]:
                 long_price = data.close[0]
 
-            if data._name == name_tuple[1]:
+            if data._name == symbol_tuple[1]:
                 short_price = data.close[0]
 
         output += ("long price: %f, shot price %f\n" % (long_price, short_price))
         relative_volatility = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)
         output += ("%f %%\n" % (relative_volatility * 100))
         print(output)
-        if event_period.check():
+        if not backtest_mode and event_period.check():
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
+            print("send email notify")
 
     def notify_data(self, data, status, *args, **kwargs):
         dn = data._name
@@ -117,7 +118,6 @@ class HudgeGripStrategy(bt.Strategy):
         #    self.live_data = True
         #else:
         #    self.live_data = False
-
 
 
 
@@ -151,10 +151,10 @@ def run_backtest():
 
     cerebro = bt.Cerebro()
     cerebro.addstrategy(HudgeGripStrategy)
-    
-    cerebro.adddata(long_data, name=name_tuple[0])
-    cerebro.adddata(short_data, name=name_tuple[1])
-    
+
+    cerebro.adddata(long_data, name=symbol_tuple[0])
+    cerebro.adddata(short_data, name=symbol_tuple[1])
+
     cerebro.run()
     cerebro.plot()
 
@@ -187,23 +187,25 @@ def run_live():
     # Drop newest will prevent us from loading partial data from incomplete candles
     hist_start_date = datetime.utcnow() - timedelta(minutes=50)
 
-    short_data = store.getdata(dataname=symbol_tuple[1], name=name_tuple[1],
+    short_data = store.getdata(dataname=symbol_tuple[1], name=symbol_tuple[1],
                      timeframe=bt.TimeFrame.Minutes, fromdate=hist_start_date,
                      compression=1, ohlcv_limit=50, drop_newest=True) #, historical=True)
 
-    long_data = store.getdata(dataname=symbol_tuple[0], name=name_tuple[0],
+    long_data = store.getdata(dataname=symbol_tuple[0], name=symbol_tuple[0],
                      timeframe=bt.TimeFrame.Minutes, fromdate=hist_start_date,
                      compression=1, ohlcv_limit=50, drop_newest=True) #, historical=True)
 
     # Add the feed
-    cerebro.adddata(long_data, name = name_tuple[0])
-    cerebro.adddata(short_data, name = name_tuple[1])
+    cerebro.adddata(long_data, name = symbol_tuple[0])
+    cerebro.adddata(short_data, name = symbol_tuple[1])
 
     # Run the strategy
     cerebro.run()
 
-def run(backtest = True):
-    if backtest:
+def run():
+    if backtest_mode:
+        print('run backtest!!')
         run_backtest()
     else:
+        print('run live!!')
         run_live()
