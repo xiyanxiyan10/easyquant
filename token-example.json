@@ -1,12 +1,22 @@
 {
-    "binance": {
+    "live": {
+        "exchange":"binance",
+        "proxy": "http://127.0.0.1:7890",
         "apikey": "",
-        "secret": ""
+        "secret": "",
+        "currency":"BNB",
+        "type":"future",
+        "datas": ["ETH/USDT", "SOL/USDT"]
     },
     "mail": {
         "address": "",
         "password": "",
-        "period": "1800"
+        "period": "1200"
+    },
+    "backtest": {
+        "mode": "True",
+        "datas": ["eth", "sol"],
+        "path": "./"
     }
 }
 
