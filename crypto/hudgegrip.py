@@ -26,7 +26,11 @@ backtest_mode = False
 with open('./token.json', 'r') as f:
     config_params = json.load(f)
 
-backtest_mode = bool(config_params["backtest"]["mode"])
+if config_params["backtest"]["mode"] == 'True':
+    backtest_mode = True
+
+import pdb
+pdb.set_trace()
 mail_address = config_params["mail"]["address"]
 mail_password = config_params["mail"]["password"]
 mail_period = int(config_params["mail"]["period"])
@@ -37,17 +41,16 @@ symbol_tuple = ('ETH/USDT', 'SOL/USDT')
 price_tuple = (3659.19, 158.55)
 
 class Hudge_Indicator(bt.Indicator):
-    lines = ('relative_volatility', 'long_price_volatility', 'short_price_volatility')
+    lines = ('relative_volatility', 'long_price', 'short_price')
     params = (('value', 5),)
 
     def __init__(self):
         self.addminperiod(1)
-        self.long_price_close = self.data0.close
-        #self.short_price_close = self.data1.close
 
     def next(self):
-        self.lines.relative_volatility[0] = self.long_price_close[0]
-        print("############### %f " % self.lines.relative_volatility[0])
+        long_price = self.data0.close[0]
+        short_price = self.data1.close[0]
+        self.lines.relative_volatility[0] = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)*100
 
 def hudge_dist(old_long, new_long, old_short, new_short):
     long_price_volatility = (new_long - old_long)*1.0/old_long    #long price volatility
@@ -64,7 +67,7 @@ def hudge_dist(old_long, new_long, old_short, new_short):
 class HudgeGripStrategy(bt.Strategy):
 
     def __init__(self):
-        self.hudge_Indicator = Hudge_Indicator()
+        self.hudge_Indicator = Hudge_Indicator(self.data0, self.data1)
 
         self.ma = bt.indicators.SimpleMovingAverage(self.datas[0])
         self.ma = bt.indicators.SimpleMovingAverage(self.datas[1])
@@ -88,22 +91,21 @@ class HudgeGripStrategy(bt.Strategy):
             # Slow things down.
         #    cash = 'NA'
 
-        long_price = -1.0
-        short_price = -1.0
+        long_price = -1
+        short_price = -1
         output = ''
         for data in self.datas:
             output += ('{} - {} | O: {} H: {} L: {} C: {} V:{}\n'.format(data.datetime.datetime(),
                                                                                    data._name, data.open[0], data.high[0], data.low[0], data.close[0], data.volume[0],
                                                                                    ))
-            if data._name == symbol_tuple[0]:
-                long_price = data.close[0]
+        if data._name == symbol_tuple[0]:
+            long_price = data.close[0]
 
-            if data._name == symbol_tuple[1]:
-                short_price = data.close[0]
+        if data._name == symbol_tuple[1]:
+            short_price = data.close[0]
 
         output += ("long price: %f, shot price %f\n" % (long_price, short_price))
-        relative_volatility = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)
-        output += ("%f %%\n" % (relative_volatility * 100))
+        output += ("%f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
         print(output)
         if not backtest_mode and event_period.check():
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
