@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
 
 class EventPeriod:
 
@@ -14,7 +14,6 @@ class EventPeriod:
             return True
         return False
 
-
 if __name__ == '__main__':
     import time
     event_period = EventPeriod(3)
@@ -22,4 +21,3 @@ if __name__ == '__main__':
     for i in range(20):
         print(event_period.check())
         time.sleep(1)
-
