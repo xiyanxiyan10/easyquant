@@ -103,8 +103,8 @@ class HudgeGripStrategy(bt.Strategy):
         output += ("%f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
         print(output)
         if not backtest_mode and event_period.check():
-            import pdb
-            pdb.set_trace()
+            #import pdb
+            #pdb.set_trace()
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
             print("send email notify")
 
