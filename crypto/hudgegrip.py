@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from ccxtbt import CCXTStore
 import backtrader.analyzers as btanalyzers
 import matplotlib.pyplot as plt
 import matplotlib
 import PyQt5
-matplotlib.use('Qt5Agg')
 
 import backtrader as bt
 from  lib.mail import qq_mail_send
@@ -152,6 +153,7 @@ def run_backtest():
 
     cerebro.addstrategy(HudgeGripStrategy)
     cerebro.run()
+    matplotlib.use('Qt5Agg')
     cerebro.plot()
 
 def run_live():
@@ -159,7 +161,7 @@ def run_live():
 
     # Add the strategy
     cerebro.addstrategy(HudgeGripStrategy)
-
+    
     # Create our store
     config = {'apiKey': config_params["live"]["apikey"],
           'secret': config_params["live"]["secret"],

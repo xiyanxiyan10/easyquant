@@ -1,8 +1,4 @@
-akshare
-#vnpy
-jupyter
-jupyterlab
-#ccxtbt
+ccxt
 backtrader
 matplotlib
-numpy
+PyQt5
