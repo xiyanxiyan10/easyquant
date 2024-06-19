@@ -10,7 +10,6 @@ import backtrader as bt
 from  lib.mail import qq_mail_send
 from  lib.period import EventPeriod
 from lib.tokeninsight import csv_to_btdata
-from datetime import datetime, timedelta
 from backtrader.feeds import GenericCSVData
 
 import json
@@ -46,16 +45,26 @@ end_date = config_params["backtest"]["end_date"]
 price_tuple = (3659.19, 158.55)
 
 class Hudge_Indicator(bt.Indicator):
-    lines = ('relative_volatility', 'long_price', 'short_price')
+    lines = ('relative_volatility', 'long_price', 'short_price', 'last_volatility', "relative_volatility_rate")
     params = (('value', 5),)
 
     def __init__(self):
         self.addminperiod(1)
+        self.last_volatility = None
 
     def next(self):
         long_price = self.data0.close[0]
         short_price = self.data1.close[0]
-        self.lines.relative_volatility[0] = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)*100
+
+        curr_volatility = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)*100
+        self.lines.relative_volatility[0] = curr_volatility
+
+        if self.last_volatility == None:
+            self.lines.relative_volatility_rate[0] = 0.0
+        else:
+            self.lines.relative_volatility_rate[0] = curr_volatility - self.last_volatility
+
+        self.last_volatility = curr_volatility
 
 def hudge_dist(old_long, new_long, old_short, new_short):
     long_price_volatility = (new_long - old_long)*1.0/old_long    #long price volatility
@@ -113,7 +122,7 @@ class HudgeGripStrategy(bt.Strategy):
 
     def notify_data(self, data, status, *args, **kwargs):
         dn = data._name
-        dt = datetime.now()
+        dt = datetime.datetime.now()
         msg= 'Data Status: {}'.format(data._getstatusname(status))
         print(dt,dn,msg)
         # if data._getstatusname(status) == 'LIVE':
@@ -193,7 +202,7 @@ def run_live():
 
     # Get our data
     # Drop newest will prevent us from loading partial data from incomplete candles
-    hist_start_date = datetime.utcnow() - timedelta(minutes=50)
+    hist_start_date = datetime.datetime.utcnow() - datetime.timedelta(minutes=50)
 
     for i in range(len(symbol_tuple)):
         live_data = store.getdata(dataname=symbol_tuple[i], name=symbol_tuple[i],
