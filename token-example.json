@@ -2,21 +2,23 @@
     "live": {
         "exchange":"binance",
         "proxy": "http://127.0.0.1:7890",
-        "apikey": "",
-        "secret": "",
+        "apikey": "87mwu2GjsxS6U7pEU7tmvKuCLOnlGajOModmy3",
+        "secret": "s6Ju7GVst6sQPt85zNVK6PY7v4u1bimWKZ5ioA",
         "currency":"BNB",
         "type":"future",
         "datas": ["ETH/USDT", "SOL/USDT"]
     },
     "mail": {
-        "address": "",
-        "password": "",
+        "address": "873706@qq.com",
+        "password": "rplqrv",
         "period": "1200"
     },
     "backtest": {
         "mode": "True",
         "datas": ["eth", "sol"],
-        "path": "./"
+        "path": "./",
+        "start_date":"2024-05-19",
+        "end_date":"2024-06-19"
     }
 }
 

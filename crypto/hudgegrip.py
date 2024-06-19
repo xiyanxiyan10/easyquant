@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from backtrader.feeds import GenericCSVData
 
 import json
-
+import datetime
 
 # Policy for make profit from volatility in hudge
 # Refers:
@@ -37,6 +37,10 @@ event_period = EventPeriod(mail_period)
 symbol_tuple = config_params["live"]["datas"]
 backfile_array = config_params["backtest"]["datas"]
 backfile_path = config_params["backtest"]["path"]
+
+start_date = config_params["backtest"]["start_date"]
+end_date = config_params["backtest"]["end_date"]
+
 
 ## 0 is long and 1 is short
 price_tuple = (3659.19, 158.55)
@@ -104,8 +108,6 @@ class HudgeGripStrategy(bt.Strategy):
         output += ("%f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
         print(output)
         if not backtest_mode and event_period.check():
-            #import pdb
-            #pdb.set_trace()
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
             print("send email notify")
 
@@ -148,11 +150,18 @@ broker_mapping = {
 def run_backtest():
     cerebro = bt.Cerebro()
     for i in range(len(backfile_array)):
-        back_data = csv_to_btdata(backfile_path + backfile_array[i] + ".csv")
+        dict_run = {}
+        if start_date != "--":
+            dict_run["fromdate"] = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        if end_date != "--":
+            dict_run["todate"] = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        back_data = csv_to_btdata(backfile_path + backfile_array[i] + ".csv", **dict_run)
         cerebro.adddata(back_data, name=backfile_array[i])
 
     cerebro.addstrategy(HudgeGripStrategy)
+
     cerebro.run()
+
     matplotlib.use('Qt5Agg')
     cerebro.plot()
 
@@ -161,7 +170,7 @@ def run_live():
 
     # Add the strategy
     cerebro.addstrategy(HudgeGripStrategy)
-    
+
     # Create our store
     config = {'apiKey': config_params["live"]["apikey"],
           'secret': config_params["live"]["secret"],

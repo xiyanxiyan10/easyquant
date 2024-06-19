@@ -2,21 +2,23 @@ import backtrader as bt
 from backtrader.feeds import GenericCSVData
 from datetime import date
 
-def csv_to_btdata(path):
-    btdata = GenericCSVData(dataname=path,
-                     dtformat=('%Y-%m-%d'),
-                     datetime=0,
-                     high=1,
-                     low=1,
-                     open=1,
-                     close=1,
-                     volume=2,
-                     openinterest=-1,
-                     #fromdate=date(2021, 2, 16),
-                     #todate=date(2021, 2, 16)
-                    )
+def csv_to_btdata(path, **kwargs):
+    load_dict = {
+        "dataname":path,
+        "dtformat":('%Y-%m-%d'),
+        "datetime":0,  
+        "high": 1,      
+        "low": 1,
+        "open": 1,
+        "close": 1,
+        "volume": 2,
+        "openinterest":-1
+    }
+    load_dict.update(kwargs)
+    btdata = GenericCSVData(**load_dict)
 
     return btdata
+
 
 
 import datetime
