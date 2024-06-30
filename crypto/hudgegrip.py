@@ -4,7 +4,6 @@ from ccxtbt import CCXTStore
 import backtrader.analyzers as btanalyzers
 import matplotlib.pyplot as plt
 import matplotlib
-import PyQt5
 
 import backtrader as bt
 from  lib.mail import qq_mail_send
@@ -171,6 +170,7 @@ def run_backtest():
 
     cerebro.run()
 
+    import PyQt5
     matplotlib.use('Qt5Agg')
     cerebro.plot()
 
