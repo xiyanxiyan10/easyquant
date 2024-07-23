@@ -19,8 +19,6 @@ def csv_to_btdata(path, **kwargs):
 
     return btdata
 
-
-
 import datetime
 import backtrader as bt
 import backtrader.feeds as btfeeds
