@@ -62,19 +62,14 @@ class Hudge_Indicator(bt.Indicator):
             self.lines.relative_volatility_rate[0] = 0.0
         else:
             self.lines.relative_volatility_rate[0] = curr_volatility - self.last_volatility
-
+        
         self.last_volatility = curr_volatility
 
 def hudge_dist(old_long, new_long, old_short, new_short):
     long_price_volatility = (new_long - old_long)*1.0/old_long    #long price volatility
     short_price_volatility = (old_short - new_short)*1.0/old_short # shot price volatility
 
-    long_profit_volatility = (new_long - old_long)*1.0/new_long*level*100    #long price volatility
-    short_profit_volatility = (old_short - new_short)*1.0/new_short*level*100 # shot price volatility
-
     relative_volatility = long_price_volatility + short_price_volatility
-    if relative_volatility < 0.0:
-        relative_volatility = 0 - relative_volatility
     return relative_volatility
 
 class HudgeGripStrategy(bt.Strategy):
@@ -113,7 +108,7 @@ class HudgeGripStrategy(bt.Strategy):
         short_price = self.data1.close[0]
 
         output += ("long price: %f, shot price %f\n" % (long_price, short_price))
-        output += ("%f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
+        output += ("relative_volatility: %f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
         print(output)
         if not backtest_mode and event_period.check():
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
