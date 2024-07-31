@@ -58,12 +58,14 @@ class Hudge_Indicator(bt.Indicator):
         curr_volatility = hudge_dist(price_tuple[0], long_price, price_tuple[1], short_price)*100
         self.lines.relative_volatility[0] = curr_volatility
 
-        if self.last_volatility == None:
-            self.lines.relative_volatility_rate[0] = 0.0
-        else:
-            self.lines.relative_volatility_rate[0] = curr_volatility - self.last_volatility
+        #if self.last_volatility == None:
+        #    self.lines.relative_volatility_rate[0] = 0.0
+        #else:
+        #    relative_volatility_rate = (curr_volatility - self.last_volatility)*1.0/self.last_volatility
+        #    self.lines.relative_volatility_rate[0] = abs(relative_volatility_rate*10)
         
         self.last_volatility = curr_volatility
+        
 
 def hudge_dist(old_long, new_long, old_short, new_short):
     long_price_volatility = (new_long - old_long)*1.0/old_long    #long price volatility
