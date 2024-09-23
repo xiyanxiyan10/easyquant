@@ -101,16 +101,19 @@ class HudgeGripStrategy(bt.Strategy):
             # Slow things down.
         #    cash = 'NA'
 
+        long_price = self.data0.close[0]
+        short_price = self.data1.close[0]
+
         output = ''
+
+        output += ("relative_volatility: %f %% \n" % (self.hudge_Indicator.relative_volatility[0]))
+        output += ("long price: %f, shot price %f " % (long_price, short_price))
+
         for data in self.datas:
             output += ('{} - {} | O: {} H: {} L: {} C: {} V:{}\n'.format(data.datetime.datetime(),
                                                                                    data._name, data.open[0], data.high[0], data.low[0], data.close[0], data.volume[0],
                                                                                    ))
-        long_price = self.data0.close[0]
-        short_price = self.data1.close[0]
 
-        output += ("long price: %f, shot price %f\n" % (long_price, short_price))
-        output += ("relative_volatility: %f %%\n" % (self.hudge_Indicator.relative_volatility[0]))
         print(output)
         if not backtest_mode and event_period.check():
             qq_mail_send(mail_address, [mail_address], mail_password, 'hudgegride', output)
