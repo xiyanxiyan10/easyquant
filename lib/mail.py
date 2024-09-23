@@ -22,15 +22,18 @@ def qq_mail_send(sender, receivers, password, subject, content):
     msg['From'] = sender
     msg['To'] = receivers[0]
 
-
-    # 发送邮件时qq邮箱，对应qq邮箱服务器域名时smtp.qq.com  对应端口时465
-    with smtplib.SMTP_SSL(host='smtp.qq.com', port=465) as server:
+    try:
+        # 发送邮件时qq邮箱，对应qq邮箱服务器域名时smtp.qq.com  对应端口时465
+        with smtplib.SMTP_SSL(host='smtp.qq.com', port=465) as server:
         # 登录发送者的邮箱
-        server.login(sender, password)
+            server.login(sender, password)
 
-        # 开始发送邮件
-        server.sendmail(sender, receivers, msg.as_string())
-        #print("Successfully sent email")
+            # 开始发送邮件
+            server.sendmail(sender, receivers, msg.as_string())
+            #print("Successfully sent email")
+    except smtplib.SMTPResponseException as e:
+        # 捕获并处理异常，不抛出
+        print(f"SMTP Response Error: code={e.smtp_code}, message={e.smtp_error}")
 
 if __name__ == '__main__':
     qq_mail_send('873706510@qq.com', ['873706510@qq.com'], 'rplqrvhknxgmbbdb', 'hudgegride', '3333-2222')
